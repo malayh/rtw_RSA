@@ -103,6 +103,7 @@ bool miller_rabin(mpz_class num, int check_count, int bit_len, RandGen &rg)
 
         //If control reacheas here, the test it not conclusive yet
         bool passed = false;
+
         for(mpz_class i = 0 ; i < r; i++)
         {
             tmp = mod_exp(tmp,2,num);
@@ -120,6 +121,7 @@ bool miller_rabin(mpz_class num, int check_count, int bit_len, RandGen &rg)
 
         }
 
+        // if control reaches here without tests being conclusive, the number is composit
         if(!passed)
             return false;
         
