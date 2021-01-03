@@ -1,0 +1,112 @@
+- Why is prime factorizations a difficult problem?
+- How to generate giant prime numbers? How to store big numbers?
+- If X is the highest possible decimal number that can be reprensented using n bits, how many digits does X has? 
+    - number of digits = ceil ( N * log2) where N is number of bits
+
+- for u_giant_int 
+    - How to implement multiplication
+        - https://cs.stackexchange.com/questions/16226/what-is-the-fastest-algorithm-for-multiplication-of-two-n-digit-numbers
+        - https://brilliant.org/wiki/karatsuba-algorithm/
+        - karatsuba's algorithm
+
+    - How to implement divison
+        - Repeated substraction
+        - https://stackoverflow.com/questions/17319643/what-is-the-fastest-algorithm-for-division-of-crazy-large-integers
+
+
+- How to install gmp
+    - https://gmplib.org/download/gmp/gmp-6.2.1.tar.lz
+    - tar --lzip -x gmp-6.2.1.tar.lz
+    - sudo apt-get install m4
+    - ./configure --enable-cxx
+    - make
+    - make check
+    - make install
+    - In bashrc add
+        - export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
+- How to generate giant prime numbers
+    - Miller rubbin
+    - Fermat's
+        - if P is prime ( a^P - a ) % p = 0, for all a 1<= a <p
+    - AKS
+        - (x + a)^n =~ (x^n + a) mod n
+
+    - Elliptic curve 
+
+
+- Modular arithmatic
+    - https://brilliant.org/wiki/modular-arithmetic
+    - congruence
+        - For a positive integer n, the integers a and b are congruent mod n if their remainders when divided by
+        n are the same.
+        
+
+- Modular exponetiation
+    - Fast exponetiation
+        - O(log N)
+
+
+- How to convert text to ciphertext
+    - OAEP: Optimal asymmetric encryption padding
+    - https://rosettacode.org/wiki/RSA_code
+    - How to encode plaintext before encrypting
+    - How to choose block size?
+        - http://www.herongyang.com/Cryptography/RSA-BigInteger-Cleartext-Block-Size-for-RSA-Encryption.html
+        - Why is blocksize for n bits is floor((n-1)/8) bytes ?
+
+
+
+- Understanding of the flow so far
+    - Define key len, block size
+    - Generate key
+        - how to choose the random prime numbers to satisfy the key len
+            - how long does p and q has to be to make n exactly of KEY_LEN bits ?
+            - https://stackoverflow.com/questions/32721080/binary-multiplication-how-many-bits-is-a-product
+            - https://stackoverflow.com/questions/18789949/if-two-n-bit-numbers-are-multiplied-then-the-result-will-be-maximum-how-bit-long
+
+        - how to get prime numbers
+            - Miller rabin
+    - Read block
+    - Encode block
+    - Encrypt
+    - Pad block
+    - Write block
+
+- RSA
+    - https://simple.wikipedia.org/wiki/RSA_algorithm
+    - https://crypto.stackexchange.com/questions/1448/definition-of-textbook-rsa
+    - Sources:
+        -
+    - Terminology
+        - Trapdoor: Oneway function, that is hard to to reverse
+    - Coprime
+        - A and B are coprime if they don't share any common divisor.
+    - Euler's totient function
+        - phi(N) = number of integers less than N which are coprime to N
+        - if N is prime phi(N) = N - 1 , because for N to be prime none of the the numbers < N will divide N
+        - phi is multiplicative, i.e. phi(A*B) = phi(A) * phi(B)
+
+        - if N = A*B where A and B are prime, phi(N) = phi(A*B) = phi(A) * phi(B) = (A-1)*(B-1)
+            - This means if you know the prime factorization of N calculating phi(N) is easy 
+
+    - Euler's theorem
+        - m ^ phi(N) =~ 1 mod N
+
+        -  m ^ (k*phi(N)) =~ 1 mod N (why?)
+        => (m*m) ^ (k*phi(N)) =~ m mod N
+        => m ^ (k*phi(N)+1) =~ m mod N
+
+    - Modular expontiations
+        - (m^e) mod N =~ c (=~ means congruent to)
+        - (c^d) mod N =~ m
+
+        - ( (m^e)^d ) mod N =~ m 
+        => (m^(ed)) mod N =~ m
+
+    - Steps
+        - Step 1: Select two giant prime numbers e,d. Calc N = e*d
+            - N is the public key
+
+
+    
