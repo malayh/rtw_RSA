@@ -10,6 +10,13 @@ NTS:
     - in encrypt have to verify that msg < n
 */
 
+RTW::RSA::RSA(int key_size)  
+{
+    m_key_size = key_size;
+    m_block_size = key_size - 8;
+}
+
+int RTW::RSA::get_block_size() { return m_block_size; }
 
 bool RTW::RSA::is_prime(mpz_class num, int check_count, int max_bit_len)
 {
@@ -69,12 +76,6 @@ bool RTW::RSA::is_prime(mpz_class num, int check_count, int max_bit_len)
     }
 
     return true;
-}
-
-RTW::RSA::RSA(int key_size)  
-{
-    m_key_size = key_size;
-    m_block_size = key_size - 8;
 }
 
 void RTW::RSA::gen_key_pair(mpz_class &n, mpz_class &d)

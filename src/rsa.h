@@ -27,10 +27,10 @@ class RSA
 
     public:
         /// Constuctor
-        RSA(int key_size);
+        RSA(int key_size);            
 
-            
-
+        /// Returns block size
+        int get_block_size();
         /*
         * Generates public-private key pair
         * 
@@ -47,7 +47,7 @@ class RSA
         * @param cipher: cipher will be writen to this
         * @param n: public mod
         * 
-        * msg MUST BE less then n
+        * `msg` MUST BE less then n
         */
         void encrypt(const mpz_class &msg, mpz_class &cipher, const mpz_class &n);
 

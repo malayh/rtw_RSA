@@ -94,7 +94,7 @@ namespace RTW
         * @param d: private exponent
         * @param key_size: size of key in bits, must be multiple of 8
         */
-        void read_private_key(std::string path, mpz_class &n, mpz_class &d, int key_size);
+        int read_private_key(std::string path, mpz_class &n, mpz_class &d, int key_size);
 
         /*
         * Reads private key from file. 
@@ -102,8 +102,9 @@ namespace RTW
         * @param path: path to .pbk file
         * @param n: public modulas
         * @param key_size: size of key in bits, must be multiple of 8
+        * @return 0 on success, -1 on failure
         */
-        void read_public_key(std::string path, mpz_class &n, int key_size);
+        int read_public_key(std::string path, mpz_class &n, int key_size);
 
     } // Namespace fileIO
 } //namespace RTW

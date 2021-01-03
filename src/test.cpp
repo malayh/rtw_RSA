@@ -72,7 +72,7 @@ void test_RSA()
 int main(int argc, char const *argv[])
 {
     test_RandIntGenerator();   
-    void test_RSA();
+    test_RSA();
 
     return 0;
 }
