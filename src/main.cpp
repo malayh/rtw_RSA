@@ -4,24 +4,39 @@
 
 #include "util.h"
 #include "rsa.h"
+#include <CLI/CLI.hpp>
 
 int KEY_SIZE = 1024;
+int THREAD_COUNT = 100;
+
+/*
+* Todo
+*   - need to add error handling in key read/write functions
+*   - make encryption and decryption parallel
+*/
+
 
 /*
 * Generate public private key pairs
 * @param path: where to write the key files
 * @param name: name of the key. It will generate <name>.prk, <name>.puk
 * @param size: size of the key in bits, has to be multiple of 8
+* @return 0 of success, -1 on failure
 */
-void generate_key_pair(std::string path, std::string name, int size)
+int generate_key_pair(std::string path, std::string name, int size)
 {
     using namespace RTW;
     RSA rsa(size);
     mpz_class n, d;
     rsa.gen_key_pair(n,d);
 
-    FileIO::write_pub_key(path+"/"+name+".puk",n,size);
-    FileIO::write_pri_key(path+"/"+name+".prk",n,d,size);
+    if( FileIO::write_pub_key(path+"/"+name+".puk",n,size) < 0 )
+        return -1;
+
+    if ( FileIO::write_pri_key(path+"/"+name+".prk",n,d,size) < 0 )
+        return -1;
+
+    return 0;
 
 }
 
@@ -103,6 +118,8 @@ int encrypt_file(std::string path_puk, int key_size, std::string path_in, std::s
 */
 int decrypt_file(std::string path_prk, int key_size, std::string path_in, std::string path_out)
 {
+    // This shit is slow, because of the giant values of d.
+    // Todo: Put multiple thread reading the file
     using namespace RTW;        
 
     // Try to open in/out files. Return -2,-3 on error
@@ -156,13 +173,56 @@ int decrypt_file(std::string path_prk, int key_size, std::string path_in, std::s
 
 }
 
+/*
+* Dispatch action according to command.
+* @param argc argc
+* @param argv argv
+* @return status code of the task dispatched
+*/
+int dispatch_action(int argc, char const *argv[])
+{
+    CLI::App app{"Encrypt/Decrypt Files using RSA."};
+
+    app.require_subcommand(1);
+    
+
+    std::string key_file = "";
+    std::string in_file = "";
+    std::string out_file = "";
+
+    std::string out_path = "";
+    std::string name = "";
+
+
+    CLI::App *enc = app.add_subcommand("encrypt","Encrypt file with a public key.");
+    enc->add_option("-k",key_file,"Path to .puk file")->required();
+    enc->add_option("-i",in_file,"Path to file")->required();
+    enc->add_option("-o",out_file,"Path to write encrypted file")->required();
+
+    CLI::App *dec = app.add_subcommand("decrypt", "Decrypt file with a private key.");
+    dec->add_option("-k",key_file,"Path to .prk file")->required();
+    dec->add_option("-i",in_file,"Path to encryted file")->required();
+    dec->add_option("-o",out_file,"Path to write encrypted file")->required();
+
+    CLI::App *keygen = app.add_subcommand("genkey","Generate a public-private key pair.");
+    keygen->add_option("-p",out_path,"Path to dir to write the files")->required();
+    keygen->add_option("-n",name,"Name of the key.")->required();
+
+    CLI11_PARSE(app,argc,argv);
+
+    if(app.got_subcommand("encrypt"))
+        return encrypt_file(key_file,KEY_SIZE,in_file,out_file);
+
+    if(app.got_subcommand("decrypt"))
+        return decrypt_file(key_file,KEY_SIZE,in_file,out_file);
+
+    if(app.got_subcommand("genkey"))
+        return generate_key_pair(out_path,name,KEY_SIZE);
+
+    return -1;
+}
+
 int main(int argc, char const *argv[])
 {
-    int _return = 0;
-
-    // generate_key_pair("../files","malay",KEY_SIZE);
-    // _return = encrypt_file("../files/malay.puk",KEY_SIZE,"../files/giant_file.txt","../files/giant_file.txt.enc");
-    _return = decrypt_file("../files/malay.prk",KEY_SIZE,"../files/giant_file.txt.enc","giant_file.txt");
-    
-    std::cout<<_return<<std::endl;
+    return dispatch_action(argc,argv);
 }

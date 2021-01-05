@@ -3,6 +3,13 @@
 #include <assert.h>
 #include <iostream>
 
+#include <gmpxx.h>
+#include <fstream>
+#include <vector>
+#include <thread>
+
+#include <CLI/CLI.hpp>
+
 void test_RandIntGenerator()
 {
     RTW::RandIntGenerator rg;
@@ -69,10 +76,133 @@ void test_RSA()
 
 }
 
+
+struct char_wrapper
+{
+    char *buffer;
+};
+
+
+void concurrent_read(char_wrapper w, int buffer_size, int block_size, int offset)
+{
+    // offset + block_size must be less than buffer_size
+
+    using namespace RTW;
+
+    int count_bytes = block_size;
+    if ( (offset*block_size) + block_size > buffer_size )
+        count_bytes = buffer_size - (offset*block_size);
+
+
+    char _b[block_size];
+    memcpy(_b, &w.buffer[offset*block_size],count_bytes);
+
+    mpz_class msg = FileIO::bytes_to_mpz(_b,count_bytes);
+    mpz_class cipher = mod_exp(msg,655371234567891,1234567891234567);
+
+    // std::cout<<" Offset: "<<offset<<" Start Index: "<<(offset*block_size)<<" Bytes: "<<count_bytes<<std::endl;
+
+    
+}
+
+void test_thread_stuff()
+{
+    int thread_count = 100;
+    int block_size = 127;
+    int buffer_size = block_size * thread_count;
+
+    std::fstream file;
+    file.open("../files/giant_file.txt",std::ios::in|std::ios::binary);
+
+    char buffer[buffer_size];
+
+    std::vector<std::thread*> threads;
+    char_wrapper cw { buffer };
+    while(!file.eof())
+    {
+        file.read(buffer,buffer_size);
+
+        int bytes_read = file.gcount();
+        int block_count = file.gcount() / block_size;
+        if( bytes_read > 0 && bytes_read % block_size != 0 )
+            block_count++;
+
+        for(int i = 0; i < block_count; i++)
+        {
+            std::thread *_t = new std::thread(concurrent_read, cw,bytes_read,block_size,i);
+            threads.push_back(_t);
+        }
+
+        for(int i = 0 ; i<threads.size(); i++)
+            threads[i]->join();
+
+        threads.clear();
+
+    }
+
+
+
+
+}
+
+
+int test_argpaser(int argc, char const *argv[])
+{
+    CLI::App app{"Encrypt/Decrypt Files using RSA."};
+
+    app.require_subcommand(1);
+    
+
+    std::string key_file = "";
+    std::string in_file = "";
+    std::string out_file = "";
+
+    std::string out_path = "";
+    std::string name = "";
+
+
+    CLI::App *enc = app.add_subcommand("encrypt","Encrypt file with a public key.");
+    enc->add_option("-k",key_file,"Path to .puk file")->required();
+    enc->add_option("-i",in_file,"Path to file")->required();
+    enc->add_option("-o",out_file,"Path to write encrypted file")->required();
+
+    CLI::App *dec = app.add_subcommand("decrypt", "Decrypt file with a private key.");
+    dec->add_option("-k",key_file,"Path to .prk file")->required();
+    dec->add_option("-i",in_file,"Path to encryted file")->required();
+    dec->add_option("-o",out_file,"Path to write encrypted file")->required();
+
+    CLI::App *keygen = app.add_subcommand("genkey","Generate a public-private key pair.");
+    keygen->add_option("-p",out_path,"Path to dir to write the files")->required();
+    keygen->add_option("-n",name,"Name of the key.")->required();
+
+
+    CLI11_PARSE(app,argc,argv);
+    if(app.got_subcommand("encrypt"))
+    {
+        std::cout<<"Key: "<<key_file<<" In:"<<in_file<<" Out:"<<out_file<<std::endl;
+        // Do encryption shit and return
+    }
+    if(app.got_subcommand("decrypt"))
+    {
+        std::cout<<"Key: "<<key_file<<" In:"<<in_file<<" Out:"<<out_file<<std::endl;
+    }
+
+    if(app.got_subcommand("genkey"))
+    {
+        std::cout<<"Path: "<<out_path<<" Name:"<<name<<std::endl;
+    }
+
+}
+
 int main(int argc, char const *argv[])
 {
     test_RandIntGenerator();   
     test_RSA();
+
+    // test_thread_stuff();
+    // test_argpaser(argc,argv);
+
+
 
     return 0;
 }
