@@ -93,21 +93,33 @@ int RTW::FileIO::mpz_to_bytes(char *buffer, size_t size, mpz_t value)
 
 }
 
-void RTW::FileIO::write_pub_key(std::string path, mpz_class &n, int key_size)
+int RTW::FileIO::write_pub_key(std::string path, mpz_class &n, int key_size)
 {
     std::fstream file;
-    file.open(path,std::ios::binary|std::ios::out); 
+    file.open(path,std::ios::binary|std::ios::out);
+    if(file.fail())
+    {
+        file.close();
+        return -1;
+    }
 
     char buffer[key_size/8];
     mpz_to_bytes(buffer,key_size/8,n.get_mpz_t());
     file.write(buffer,key_size/8);
     file.close();
+
+    return 0;
 }
 
-void RTW::FileIO::write_pri_key(std::string path, mpz_class &n, mpz_class &d, int key_size)
+int RTW::FileIO::write_pri_key(std::string path, mpz_class &n, mpz_class &d, int key_size)
 {
     std::fstream file;
     file.open(path,std::ios::binary|std::ios::out); 
+    if(file.fail())
+    {
+        file.close();
+        return -1;
+    }
 
     char buffer[key_size/8];
     mpz_to_bytes(buffer,key_size/8,n.get_mpz_t());
@@ -117,6 +129,8 @@ void RTW::FileIO::write_pri_key(std::string path, mpz_class &n, mpz_class &d, in
     file.write(buffer,key_size/8);
 
     file.close();
+
+    return 0;
 
 }
 

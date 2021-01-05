@@ -74,17 +74,19 @@ namespace RTW
         * @param n: public modulas
         * @param d: private exponent
         * @param key_size: size of key in bits, has to be multiple of 8
+        * @return 0 on success, -1 on failure
         */
-        void write_pri_key(std::string path, mpz_class &n, mpz_class &d, int key_size);
+        int write_pri_key(std::string path, mpz_class &n, mpz_class &d, int key_size);
 
         /*
         * Write Public key to file
         * 
         * @param path: path of private key
         * @param n: public modulas
-        * @param key_size: size of key in bits, has to be multiple of 8
+        * @param key_size: size of key in bits, has to be multiple of 8\
+        * @return 0 on success, -1 on failure
         */
-        void write_pub_key(std::string path, mpz_class &n, int key_size);
+        int write_pub_key(std::string path, mpz_class &n, int key_size);
 
         /*
         * Reads private key from file. 
