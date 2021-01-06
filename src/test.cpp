@@ -145,7 +145,6 @@ void test_thread_stuff()
 
 }
 
-
 int test_argpaser(int argc, char const *argv[])
 {
     CLI::App app{"Encrypt/Decrypt Files using RSA."};
@@ -194,13 +193,64 @@ int test_argpaser(int argc, char const *argv[])
 
 }
 
+void test_encrypt_decrypt()
+{
+    using namespace RTW;
+    std::fstream file;
+    file.open("../files/file_1.test",std::ios::binary|std::ios::out);
+    char buffer[256];
+    int i;
+
+    for(i = 0; i < 10; i++)
+        buffer[i] = 0;
+
+    for(;i < 125; i++)
+        buffer[i] = 'b';
+
+    for(; i < 250; i++)
+        buffer[i] = 'a';
+
+    for(; i < 256; i++)
+        buffer[i] = 0;
+
+    file.write(buffer,256);
+    file.close();
+
+    file.open("../files/file_1.test",std::ios::binary|std::ios::in);
+
+    file.read(buffer,127);
+    mpz_class n = FileIO::bytes_to_mpz(buffer,file.gcount());
+    std::cout<<n<<"\n\n";
+
+    file.read(buffer,127);
+    n = FileIO::bytes_to_mpz(buffer,file.gcount());
+    std::cout<<n<<"\n\n";
+
+    file.read(buffer,127);
+    n = FileIO::bytes_to_mpz(buffer,file.gcount());
+    std::cout<<n<<"\n\n";
+
+
+}
+void test_IO()
+{
+    using namespace RTW;
+    mpz_class m = 0;
+    char buffer[128];
+    int count = FileIO::mpz_to_bytes(buffer,128,m.get_mpz_t());
+    std::cout<<count<<std::endl;
+}
+
 int main(int argc, char const *argv[])
 {
-    test_RandIntGenerator();   
-    test_RSA();
+    // test_RandIntGenerator();   
+    // test_RSA();
 
     // test_thread_stuff();
     // test_argpaser(argc,argv);
+    // test_IO();
+
+    test_encrypt_decrypt();
 
 
 

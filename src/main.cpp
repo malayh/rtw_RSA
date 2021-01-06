@@ -88,13 +88,16 @@ int encrypt_file(std::string path_puk, int key_size, std::string path_in, std::s
     while(!in.eof())
     {
         in.read(buffer,block_size/8);
-        int count = in.gcount();
-        msg = FileIO::bytes_to_mpz(buffer,count);
+        if( in.gcount() < 1)
+            continue;
+        
+        msg = FileIO::bytes_to_mpz(buffer,in.gcount());
         rsa.encrypt(msg,cipher,n);
         
-        count = FileIO::mpz_to_bytes(buffer,key_size/8,cipher.get_mpz_t());
-        if(count > 0)
-            out.write(buffer,key_size/8);
+        // Cipher is always a key_size/8 byte long number, so if any number of bytes were read from
+        // input file, buffer will contain key_size/8 bytes representing cipher 
+        FileIO::mpz_to_bytes(buffer,key_size/8,cipher.get_mpz_t());
+        out.write(buffer,key_size/8);
     }
 
     in.close();
@@ -155,15 +158,19 @@ int decrypt_file(std::string path_prk, int key_size, std::string path_in, std::s
         in.read(buffer,key_size/8);
         int count = in.gcount();
 
-        if(!count)
+        if(count < 1)
             continue;
 
         cipher = FileIO::bytes_to_mpz(buffer,key_size/8);
+
         rsa.decrypt(cipher,msg,n,d);
         
         count = FileIO::mpz_to_bytes(buffer,key_size/8,msg.get_mpz_t());
         if(count > 0)
             out.write(buffer,count);
+        else if ( msg == 0 )
+            out.write(buffer,in.gcount());
+
     }
 
     in.close();
