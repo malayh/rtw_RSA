@@ -20,7 +20,7 @@ Because all those who invented something refused to use whatever already existed
 ## RSA
 This is a implemention of RSA cryptosystem from scratch. I have documented how the underlying mathematics and the implementation in the following blog post. I have tried my best to make it pedagogically complete. I hope it's useful.
 
-* To do: Add url to blog post
+Article: [RSA Cryptosystem from scratch](https://thehazarika.com/blog/programming/rsa-cryptosystem/)
 
 
 
@@ -28,7 +28,6 @@ This is a implemention of RSA cryptosystem from scratch. I have documented how t
 This implementation depends on GMP.
 
 ### Install GMP
-
 ```
 wget https://gmplib.org/download/gmp/gmp-6.2.1.tar.lz
 ```
@@ -83,3 +82,17 @@ This will encrypt `sample.txt` using public key `malay.puk` and write the encrpt
 ./rtwrsa decrypt -k malay.prk -i sample.txt.enc -o sample_d.txt
 ```
 This will decrypt `sample.txt.enc` using private key `malay.prk` and write the decrypted text file to `sample_d.txt`
+
+### Disclaimer
+This is "text book" version of RSA meaning there are few features missing, which makes it vulnerable to some known attacks. So don't use this in you production systems.
+
+### Contribution
+The are few key things missing in this implemetation. If you think it is worth your time to try and make it a production ready piece of software, feel free to send in a pull request. 
+
+Following are few things I can think of that are missing.
+
+#### Things to be implmented
+- Padding schema
+- Ability to encrypt/decrypt binary files
+
+
